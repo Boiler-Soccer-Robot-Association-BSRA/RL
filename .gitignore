@@ -1,0 +1,22 @@
+# Private repository-planning files
+AGENTS.md
+CONTEXT.md
+PLANNING.md
+CARTPOLE_ONBOARDING_PLANNING.md
+.obsidian/
+
+# Local Python files
+.venv/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+.ruff_cache/
+MUJOCO_LOG.TXT
+
+# Generated training artifacts
+logs/
+runs/
+models/
+videos/

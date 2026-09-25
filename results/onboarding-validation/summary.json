@@ -1,0 +1,78 @@
+{
+  "run_name": "onboarding-validation",
+  "seeds": [
+    10000,
+    10001,
+    10002,
+    10003,
+    10004,
+    10005,
+    10006,
+    10007,
+    10008,
+    10009,
+    10010,
+    10011,
+    10012,
+    10013,
+    10014,
+    10015,
+    10016,
+    10017,
+    10018,
+    10019
+  ],
+  "deterministic_policy": true,
+  "action_seed_offset": 20000,
+  "std_ddof": 0,
+  "task": {
+    "environment": "InvertedPendulum-v5",
+    "frame_skip": 2,
+    "max_episode_steps": 1000,
+    "reset_noise_scale": 0.01,
+    "files_sha256": {
+      "assets/cartpole.xml": "dec1c4d195ac5624bb60d03d071a692d58cef658ec94fa327fd4ba9c3df8a547",
+      "assets/scene.xml": "1ea8455321b1e86c801d379e8fd3b5832e13dd5cded9e670900c3f66701cdf06",
+      "onboarding/env.py": "519a21ab174ac11fc60d846585e9b1ca8bb1ee44084ca98df9cf56f3fbf43ab9"
+    }
+  },
+  "versions": {
+    "python": "3.12.3",
+    "gymnasium": "1.2.3",
+    "mujoco": "3.6.0",
+    "stable-baselines3": "2.7.1",
+    "torch": "2.10.0+cpu",
+    "numpy": "2.4.2",
+    "tensorboard": "2.21.0",
+    "imageio-ffmpeg": "0.6.0"
+  },
+  "policy_sha256": "2641a1a8a1cc2980ed93e184bb4f4499aefe371f2cbbda0a413a399444509ca4",
+  "results": {
+    "random": {
+      "episodes": 20,
+      "return_mean": 4.8,
+      "return_std": 2.6570660511172846,
+      "length_mean": 5.8,
+      "length_std": 2.6570660511172846,
+      "time_limit_fraction": 0.0
+    },
+    "ppo": {
+      "episodes": 20,
+      "return_mean": 1000.0,
+      "return_std": 0.0,
+      "length_mean": 1000.0,
+      "length_std": 0.0,
+      "time_limit_fraction": 1.0
+    }
+  },
+  "video": {
+    "path": "videos/onboarding-validation/episode-10000.mp4",
+    "seed": 10000,
+    "policy": "ppo",
+    "fps": 25,
+    "width": 640,
+    "height": 480,
+    "frames": 1000,
+    "codec": "h264"
+  }
+}

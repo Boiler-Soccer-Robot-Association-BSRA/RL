@@ -1,0 +1,42 @@
+[project]
+name = "bsra-rl-onboarding"
+version = "0.1.0"
+description = "BSRA's bounded CartPole learning exercise"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "gymnasium[mujoco]==1.2.3",
+    "mujoco==3.6.0",
+    "stable-baselines3==2.7.1",
+    "torch==2.10.0",
+    "tensorboard==2.21.0",
+    "numpy==2.4.2",
+    "imageio-ffmpeg==0.6.0",
+]
+
+[dependency-groups]
+dev = ["pytest==9.0.2"]
+
+[build-system]
+requires = ["uv_build==0.10.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "onboarding"
+module-root = ""
+
+[tool.uv]
+environments = [
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64'",
+]
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
