@@ -1,22 +1,40 @@
 # CartPole onboarding
 
-Build a MuJoCo cart-pole, connect it to Gymnasium, and train and evaluate a PPO
-policy. Finish with a short report and a pull request in your own fork.
-This is a learning exercise; robot skills and larger experiments belong in separate repositories.
+CartPole is a balancing task: a pole is attached by a free hinge to a cart that
+moves left and right. You control the cart's motor, and the pole moves in response
+to gravity and the cart's motion. The objective is to keep the pole upright for
+as long as possible within an episode.
+
+You will build the physical model in MuJoCo, connect it to Gymnasium's supplied
+balancing task, and train a PPO policy (a learned controller). The policy receives
+the cart and pole positions and velocities, then chooses a motor control. It
+learns from rewards for keeping the pole upright. You will evaluate the saved
+policy against random actions to see what it learned.
+
+By the end, you should be able to explain how simulation, observations, actions,
+rewards, and training results connect across the toolchain, and support your
+conclusions with a repeatable experiment. Finish with a short report and a pull
+request in your own fork.
 
 Start after the [orientation](ORIENTATION.md). You need basic Python functions,
 classes, and imports; Git and RL experience are not required. Budget about
-**8–12 focused hours over two weeks**, with a third week for setup or debugging.
-The effort estimate still needs a beginner pilot.
+**6–8 focused hours over two weeks**.
 
-| Section | Outcome | Time |
-| --- | --- | --- |
-| 1. Setup | Working fork, branch, and Python environment | 1.5–2 h |
-| 2. Model | Two composed XML files that load and move | 2–3 h |
-| 3. Environment | A checked, documented RL task | 1.5–2 h |
-| 4. Training | Saved policy and TensorBoard logs | 1–2 h |
-| 5. Evaluation | Baseline comparison and one recorded episode | 1–1.5 h |
-| 6. Handoff | Report and reviewed, merged fork PR | 1–1.5 h |
+**Before starting:** read the [toolchain overview](../resources/toolchain.md).
+Be able to explain how MuJoCo, Gymnasium, Stable-Baselines3 (SB3), and TensorBoard
+contribute to this exercise, and answer the toolchain question in
+[REPORT.md](REPORT.md#setup). As you work through each stage, use the report
+questions to trace which tool uses the inputs you write, where its outputs come
+from, and what uses those outputs next.
+
+| Section        | Outcome                                      |
+| -------------- | -------------------------------------------- |
+| 1. Setup       | Working fork, branch, and Python environment |
+| 2. Model       | Two composed XML files that load and move    |
+| 3. Environment | A checked, documented RL task                |
+| 4. Training    | Saved policy and TensorBoard logs            |
+| 5. Evaluation  | Baseline comparison and one recorded episode |
+| 6. Handoff     | Report and reviewed, merged fork PR          |
 
 **Member files:** complete `MEMBER TODO` blocks in `assets/cartpole.xml`,
 `assets/scene.xml`, `onboarding/env.py`, `onboarding/train.py`, and
@@ -31,7 +49,7 @@ sections are expected to fail; the setup diagnostic works immediately.
 
 **Files to edit:** [REPORT.md](REPORT.md) (Setup).
 
-Read the [toolchain overview](../resources/toolchain.md). Install
+Install
 [Git](https://docs.github.com/en/get-started/git-basics/set-up-git) and
 [uv](https://docs.astral.sh/uv/getting-started/installation/) in the environment
 where you will run the exercise. New to terminals? Read the
@@ -170,55 +188,47 @@ Each viewer trial starts from zero. Rotate the camera to check the axes.
 and the pole rotates about the hinge. It need not balance without a policy.
 
 Save a small screenshot in `results/model.png`, link it in the report, and explain
-which XML file owns the mechanism. Commit the two XML files and report evidence.
+which XML file owns the mechanism. Use `scripts/view_model.py` to identify which
+tool loads the XML and produces the simulated motion, then answer the report's
+model questions. Commit the two XML files and report evidence.
 
 ## 3. Environment setup and inspection
 
 **Files to edit:** [onboarding/env.py](../onboarding/env.py) and
-[REPORT.md](REPORT.md) (Model and task).
+[REPORT.md](REPORT.md#environment-stage-3) (Environment).
 
 **Before starting:** model tests pass. Review
 [Gymnasium basic usage](https://gymnasium.farama.org/introduction/basic_usage/) and
 the [InvertedPendulum task](https://gymnasium.farama.org/environments/mujoco/inverted_pendulum/).
-Gymnasium already defines the observations, rewards, reset behavior, and termination rules. Your job is to connect our custom model and understand that supplied task.
-You do not need to design or implement observation or reward functions.
+
+MuJoCo computes motion from your XML model and the applied controls. Gymnasium
+connects that simulation to RL: it accepts actions, returns observations and
+rewards, and starts new episodes with `reset()`. Your job is to connect the model
+and understand these interactions. The observation and reward functions are
+already supplied.
 
 Complete `make_env()` in `onboarding/env.py`, using the supplied path and task
 constants. Pass the rendering mode and episode limit through to `gym.make()`.
 The latter applies the `TimeLimit` wrapper.
 
-### Where the simulation values live
-
-MuJoCo separates the compiled model parameters (`mujoco.MjModel`) from the current
-simulation state (`mujoco.MjData`). In our environment, these are available as
-`env.unwrapped.model` and `env.unwrapped.data`. The latter contains `qpos` for joint
-positions, `qvel` for joint velocities, and `ctrl` for actuator controls. In the
-environment's source, `self.data` refers to that same data object.
-
-Read MuJoCo's [Python structs documentation](https://mujoco.readthedocs.io/en/stable/python.html#structs)
-and [named access examples](https://mujoco.readthedocs.io/en/stable/python.html#named-access)
-to understand how those values are exposed. Recognize these attributes while
-reading the supplied environment code; no separate state-access exercise is needed.
-
-### Explain the supplied task
+### Understand the supplied task
 
 Read `_get_obs()`, `reset_model()`, and `step()` in the
 [pinned upstream implementation](https://github.com/Farama-Foundation/Gymnasium/blob/v1.2.3/gymnasium/envs/mujoco/inverted_pendulum_v5.py).
-Use that source, your XML, the constants in `onboarding/env.py`, and the linked
-documentation to fill the task table in `docs/REPORT.md` in your own words:
+For the physics, follow `do_simulation()` to `_step_mujoco_simulation()` in the
+[MuJoCo environment base class](https://github.com/Farama-Foundation/Gymnasium/blob/v1.2.3/gymnasium/envs/mujoco/mujoco_env.py)
+to see how actions reach the simulator. In this code, `self.data` is MuJoCo's
+simulation data: `qpos` holds joint positions, `qvel` holds joint velocities, and
+`ctrl` holds actuator controls.
 
-- How does `_get_obs()` turn `qpos` and `qvel` into the observation? Match each
-  entry to a joint and identify its units, shape, and dtype.
-- What action can the policy choose, and how does the motor's gear affect it?
-- How much simulated time passes per action? Check the physics timestep,
-  `env.unwrapped.frame_skip`, and `env.unwrapped.dt`.
-- What changes at reset, and what does setting a seed reproduce?
-- Where does `step()` advance physics, compute the reward, and decide termination?
-  What makes a state healthy, and is the reward based on the state before or after
-  the action?
-- Which ending flag comes from `TimeLimit`, and how is its limit configured?
-  Do the XML joint travel limits themselves end an episode? Explain why the
-  rollout must reset after either ending flag.
+Use that code, your XML, and the constants in `onboarding/env.py` to answer the
+five questions in [REPORT.md](REPORT.md#environment-stage-3): **observations,
+actions, physics, reset, and reward**. Keep each answer short and name the code
+or setting that supports it.
+
+During a rollout, reset after either `terminated` (task failure) or `truncated`
+(the `TimeLimit` episode limit). XML joint travel limits constrain the motion;
+they do not themselves end an episode.
 
 ### How you know you've finished
 
@@ -239,13 +249,11 @@ uv run python scripts/evaluate.py --random-only --run-name random-debug --episod
 uv run python scripts/evaluate.py --random-only --run-name random-debug --episodes 3 --video
 ```
 
-Open `videos/random-debug/episode-10000.mp4`. On headless Linux, prefix the video
-command with `MUJOCO_GL=osmesa` if that renderer passed Setup.
+Open `videos/random-debug/episode-10000.mp4`.
 
 **Finished when:** API and behavior tests pass; random episodes end and reset; the custom
 scene is visible. SB3 warns that the action range is not normalized to `[-1, 1]`.
-Keep `[-3, 3]` for this task and record that warning. Explain one bug that the
-behavior tests catch beyond an API shape check.
+Keep `[-3, 3]` for this task and record that warning.
 
 ## 4. Training and experiment tracking
 
@@ -293,7 +301,11 @@ revision, then train the policy you will evaluate in Stage 5:
 uv run python scripts/train.py --run-name first-run --seed 0 --steps 100000
 ```
 
-Open TensorBoard to inspect the recorded learning statistics:
+Read SB3's [TensorBoard integration guide](https://stable-baselines3.readthedocs.io/en/v2.7.1/guide/tensorboard.html)
+and [metric definitions](https://stable-baselines3.readthedocs.io/en/v2.7.1/common/logger.html#rollout).
+Use the report questions to distinguish the environment's rewards, `Monitor`'s
+episode statistics, SB3's logging, and TensorBoard's display. Open TensorBoard
+to inspect the recorded learning statistics:
 
 ```bash
 uv run tensorboard --logdir runs
@@ -360,7 +372,9 @@ uv run python scripts/evaluate.py --policy models/first-run/policy.zip --run-nam
 ```
 
 **Finished when:** tests pass, the video plays, and your report compares the
-baseline and PPO results using the generated CSV and JSON files.
+baseline and PPO results using the generated CSV and JSON files. Explain how
+`onboarding/evaluate.py` uses the saved policy and environment to produce those
+results and the video.
 
 ## 6. Report and GitHub handoff
 

@@ -10,7 +10,7 @@ This is the learning and research hub for the Reinforcement Learning subteam of 
 ## Start here
 
 1. **[Complete the orientation](docs/ORIENTATION.md)** — allow roughly 60–90 minutes to learn the shared RL vocabulary. No installation, coding, or prior RL experience is required.
-2. **[Work through CartPole onboarding](docs/ONBOARDING.md)** — build a MuJoCo model, connect it to a Gymnasium task, train a PPO policy, and evaluate it against random actions. You need basic Python functions, classes, and imports; the guide introduces the Git workflow. Budget about 8–12 focused hours over two weeks, with a third week for setup or debugging. This estimate still needs a beginner pilot.
+2. **[Work through CartPole onboarding](docs/ONBOARDING.md)** — build a MuJoCo model, connect it to a Gymnasium task, train a PPO policy, and evaluate it against random actions. You need basic Python functions, classes, and imports; the guide introduces the Git workflow. Budget about 6–8 focused hours over two weeks.
 3. **Complete your handoff** — fill in [docs/REPORT.md](docs/REPORT.md), review and merge your assignment PR within your own fork, and share the completed repository with the RL lead. Follow the [handoff instructions](docs/ONBOARDING.md#6-report-and-github-handoff), then move to a separate project repository when you receive a team assignment.
 
 ## How the onboarding works

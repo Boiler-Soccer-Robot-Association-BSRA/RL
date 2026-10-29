@@ -1,22 +1,11 @@
 <mujoco model="bsra_cartpole">
   <!-- MEMBER TODO 2.3: Set compiler angle units and simulation options.
        Disable geom collisions with a default shared by model and scenery. -->
-  <compiler angle="degree"/>
-  <option gravity="0 0 -9.81" integrator="RK4" timestep="0.02"/>
-  <default>
-    <geom contype="0" conaffinity="0"/>
-  </default>
 
   <!-- MEMBER TODO 2.4: Include cartpole.xml here. -->
-  <include file="cartpole.xml"/>
 
   <worldbody>
     <!-- MEMBER TODO 2.5: Add a floor, rail, light, and camera named side.
          Choose a view showing the full rail and upright pole. -->
-    <geom name="floor" type="plane" size="3 2 0.1" rgba="0.18 0.21 0.25 1"/>
-    <geom name="rail" type="box" pos="0 0 0.08" size="1.5 0.04 0.04"
-          rgba="0.60 0.65 0.70 1"/>
-    <light pos="0 -2 4" dir="0 0.5 -1"/>
-    <camera name="side" pos="0 -4 1.8" xyaxes="1 0 0 0 0.31 0.95"/>
   </worldbody>
 </mujoco>

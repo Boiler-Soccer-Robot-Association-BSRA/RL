@@ -14,7 +14,9 @@ def main() -> None:
     parser.add_argument("--control", type=float, choices=[-0.1, 0.0, 0.1], default=0.0)
     parser.add_argument("--seconds", type=float, default=10.0)
     args = parser.parse_args()
+
     model = mujoco.MjModel.from_xml_path(str(args.xml.resolve()))
+
     print(f"qpos={model.nq}, qvel={model.nv}, actuators={model.nu}, timestep={model.opt.timestep}s")
     view_model(model, args.control, args.seconds)
 
